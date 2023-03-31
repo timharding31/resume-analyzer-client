@@ -1,0 +1,64 @@
+@import './fonts.css';
+
+@tailwind base;
+@layer base {
+  .flex-auto {
+    min-height: 0;
+    min-width: 0;
+  }
+  html {
+    line-height: 1.15;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Merriweather', serif;
+    font-weight: bold;
+  }
+
+  h1 {
+    font-size: 2em;
+  }
+
+  h2 {
+    font-size: 1.5em;
+  }
+
+  h3 {
+    font-size: 1.17em;
+  }
+
+  h4 {
+    font-size: 1em;
+  }
+
+  h5 {
+    font-size: 0.83em;
+  }
+
+  h6 {
+    font-size: 0.75em;
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+
+  ol {
+    list-style-type: decimal;
+  }
+}
+
+@tailwind components;
+@tailwind utilities;
+
+#root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
