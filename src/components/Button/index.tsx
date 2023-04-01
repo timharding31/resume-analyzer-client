@@ -2,7 +2,7 @@ import React from 'react'
 import classNames from 'classnames'
 import styles from './styles.css'
 
-interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary'
   size?: 'small' | 'medium' | 'large'
 }
