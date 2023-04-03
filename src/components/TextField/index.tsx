@@ -1,10 +1,11 @@
 import React from 'react'
 import classNames from 'classnames'
 
-interface TextFieldProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
+interface TextFieldProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'required'> {
   label: string
   prefix?: string
-  required?: boolean
+  required?: boolean | ((name: string) => boolean)
 }
 
 export const TextField: React.FC<TextFieldProps> = ({
@@ -16,6 +17,10 @@ export const TextField: React.FC<TextFieldProps> = ({
 }) => {
   const inputId = inputProps.id ?? label.toLowerCase()
   const hasPrefix = !!prefix
+  const isRequired =
+    typeof required === 'function' && inputProps.name != null
+      ? required(inputProps.name)
+      : !!required
 
   const getInputClassNames = () => {
     const inputClasses = [
@@ -49,7 +54,7 @@ export const TextField: React.FC<TextFieldProps> = ({
         className="block text-sm font-medium leading-6 text-gray-900 text-left"
       >
         {label}
-        {!!required && <span className="text-red-600 font-normal ml-0.5">*</span>}
+        {isRequired && <span className="text-red-600 font-normal ml-0.5">*</span>}
       </label>
       <div className="relative mt-2 rounded-md shadow-sm">
         {!!prefix && (

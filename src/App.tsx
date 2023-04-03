@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { TextField, Button, FileInput, Radio, Checkbox } from './components'
-import axios from 'axios'
+import { TextField, Button, FileUpload, Radio, Checkbox } from './components'
 
 function App() {
   const [name, setName] = useState('')
@@ -35,36 +34,39 @@ function App() {
     setFile(undefined)
   }
 
+  const handleGetJoke = async () => {
+    const response = await fetch('/api/joke').then(res => res.json())
+    setResponse(response)
+  }
+
   return (
     <div className="w-full m-auto max-w-lg">
-      <div className="mb-2 flex flex-col items-center gap-4">
-        <h2 className="block font-medium text-gray-900">
-          <strong>Message: </strong>
-          {message}
-        </h2>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            label="Name"
-            value={name}
-            onChange={e => setName(e.target.value)}
-            className="w-full"
-            required
-          />
-          <FileInput
-            onChange={handleFile}
-            onRemove={() => setFile(undefined)}
-            label="Resume"
-            value={file?.name}
-            required
-          />
-          <div className="flex items-center gap-2 ml-auto">
-            <Button variant="primary" size="medium" type="submit">
-              Click me
-            </Button>
-          </div>
-        </form>
-      </div>
-      {response != null && <pre>{JSON.stringify(response)}</pre>}
+      <form onSubmit={handleSubmit} className="mb-2 flex flex-col items-stretch gap-4">
+        <TextField
+          label="Name"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          className="w-full"
+          required
+        />
+        <FileUpload
+          label="Resume"
+          file={file}
+          onRemove={() => setFile(undefined)}
+          onUpload={file => setFile(file)}
+          required
+          className="w-full"
+        />
+        <div className="flex items-center gap-2 ml-auto">
+          <Button variant="primary" size="medium" type="submit">
+            Submit
+          </Button>
+        </div>
+      </form>
+      <Button variant="secondary" size="large" type="button" onClick={handleGetJoke}>
+        Tell me a joke
+      </Button>
+      {response != null && <div dangerouslySetInnerHTML={{ __html: `${response}` }} />}
     </div>
   )
 }
