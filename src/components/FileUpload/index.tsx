@@ -1,6 +1,7 @@
 import React from 'react'
 import classNames from 'classnames'
 import { useDropzone } from 'react-dropzone'
+import { Label } from '../Label'
 import { Button } from '../Button'
 import { DocumentIcon, TrashIcon } from '@heroicons/react/24/outline'
 
@@ -8,6 +9,7 @@ interface FileUploadProps {
   file?: File
   onUpload: (acceptedFile: File) => void
   onRemove: () => void
+  onError?: () => void
   label: string
   required?: boolean
   className?: string
@@ -17,25 +19,25 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   file,
   onUpload,
   onRemove,
+  onError,
   label,
   required,
   className
 }) => {
   const { getRootProps, getInputProps, isDragAccept, isDragReject, isDragActive } = useDropzone({
-    onDrop: files => files.forEach(onUpload),
+    onDrop: (files, errors) => {
+      files.length > 0 && files.forEach(onUpload)
+      errors.length > 0 && onError?.()
+    },
     accept: { 'application/pdf': [] },
     multiple: false
   })
 
   return (
     <div className={className} {...getRootProps()}>
-      <label
-        className="block text-sm font-medium leading-6 text-gray-900 text-left"
-        onClick={e => e.stopPropagation()}
-      >
+      <Label onClick={e => e.stopPropagation()} required={required}>
         {label}
-        {!!required && <span className="text-red-600 font-normal ml-0.5">*</span>}
-      </label>
+      </Label>
       <input {...getInputProps()} />
       <div
         className={classNames(

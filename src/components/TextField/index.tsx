@@ -1,11 +1,12 @@
 import React from 'react'
+import { Label } from '../Label'
 import classNames from 'classnames'
 
 interface TextFieldProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'required'> {
   label: string
   prefix?: string
-  required?: boolean | ((name: string) => boolean)
+  required?: boolean
 }
 
 export const TextField: React.FC<TextFieldProps> = ({
@@ -17,10 +18,6 @@ export const TextField: React.FC<TextFieldProps> = ({
 }) => {
   const inputId = inputProps.id ?? label.toLowerCase()
   const hasPrefix = !!prefix
-  const isRequired =
-    typeof required === 'function' && inputProps.name != null
-      ? required(inputProps.name)
-      : !!required
 
   const getInputClassNames = () => {
     const inputClasses = [
@@ -49,13 +46,9 @@ export const TextField: React.FC<TextFieldProps> = ({
 
   return (
     <div className={className}>
-      <label
-        htmlFor={inputId}
-        className="block text-sm font-medium leading-6 text-gray-900 text-left"
-      >
+      <Label htmlFor={inputId} required={required}>
         {label}
-        {isRequired && <span className="text-red-600 font-normal ml-0.5">*</span>}
-      </label>
+      </Label>
       <div className="relative mt-2 rounded-md shadow-sm">
         {!!prefix && (
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">

@@ -52,7 +52,16 @@ export const Button: React.FC<ButtonProps> = ({
   }
 
   const getBaseClassNames = (): string[] => {
-    return ['font-medium', 'rounded-lg', 'text-center', 'focus:ring-1', 'focus:outline-none']
+    return [
+      'cursor-pointer',
+      'font-medium',
+      'rounded-lg',
+      'text-center',
+      'focus:ring-1',
+      'focus:outline-none',
+      'disabled:bg-gray-400',
+      'disabled:cursor-not-allowed'
+    ]
   }
 
   return (

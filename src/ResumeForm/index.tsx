@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { TextField, FileUpload, Button } from '../components'
+import { TextField, TextArea, Label, FileUpload, Button } from '../components'
 import styles from './styles.css'
 
 interface ResumeFormFields {
@@ -13,31 +13,53 @@ interface ResumeFormProps {}
 
 export const ResumeForm: React.FC<ResumeFormProps> = () => {
   const [fields, setFields] = useState<Partial<ResumeFormFields>>({})
-  const [error, setError] = useState<string>()
+  const [errorMessage, setErrorMessage] = useState<string>()
   const [response, setResponse] = useState<JSON>()
+  const [loading, setLoading] = useState(false)
 
   const handleField = (
     field: keyof ResumeFormFields,
     value: ResumeFormFields[keyof ResumeFormFields]
   ) => {
+    if (typeof value === 'string' && value.length === 0) {
+      value = undefined
+    }
     setFields(prev => ({ ...prev, [field]: value }))
   }
 
-  const canSubmit = fields.name != null && fields.cv != null
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!canSubmit) {
-      setError('Missing required fields')
-      response != null && setResponse(undefined)
+
+    setLoading(true)
+
+    const qs = new URLSearchParams()
+    const init: RequestInit = { method: 'POST' }
+
+    if (fields.name != null) {
+      qs.append('name', fields.name)
     }
-    const qs = new URLSearchParams({ name: fields.name! }).toString()
-    const url = '/api/new?' + qs
-    const body = new FormData()
-    body.append('file', fields.cv!)
-    const apiResponse = await fetch(url, { method: 'POST', body }).then(res => res.json())
-    setResponse(apiResponse)
-    setFields({})
+
+    if (fields.cv != null) {
+      if (typeof fields.cv === 'string') {
+        qs.append('text', fields.cv)
+      } else {
+        init.body = new FormData()
+        init.body.append('file', fields.cv)
+      }
+    }
+
+    await fetch('/api/new?' + qs.toString(), init).then(res => {
+      if (res.ok) {
+        res.json().then(setResponse)
+        setFields({})
+        setErrorMessage(undefined)
+      } else {
+        res.json().then(error => setErrorMessage(error.detail))
+        setResponse(undefined)
+      }
+    })
+
+    setLoading(false)
   }
 
   return (
@@ -47,22 +69,35 @@ export const ResumeForm: React.FC<ResumeFormProps> = () => {
         name="name"
         value={fields.name ?? ''}
         onChange={e => handleField('name', e.target.value)}
-        className="w-full"
         required
       />
+      <Label required>Resume</Label>
       <FileUpload
-        label="Resume"
+        label="Upload file &hellip;"
         file={typeof fields.cv === 'string' ? undefined : fields.cv}
         onRemove={() => handleField('cv', undefined)}
-        onUpload={file => handleField('cv', file)}
-        className="w-full"
-        required
+        onUpload={file => {
+          handleField('cv', file)
+          setErrorMessage(undefined)
+        }}
+        onError={() => setErrorMessage('Invalid file type. The accepted file types are: pdf')}
+        className="ml-4"
+      />
+      <TextArea
+        label="&hellip; or paste text"
+        name="resume"
+        value={typeof fields.cv === 'string' ? fields.cv : ''}
+        onChange={e => handleField('cv', e.target.value.substring(0, 3000))}
+        charLimit={3000}
+        className="ml-4"
       />
       <div className="flex items-center gap-2 ml-auto">
-        <Button variant="primary" size="medium" type="submit">
+        <Button variant="primary" size="medium" type="submit" disabled={loading}>
           Submit
         </Button>
       </div>
+      {response != null && <div dangerouslySetInnerHTML={{ __html: `${response}` }} />}
+      {errorMessage != null && <div className="text-red-600">{errorMessage}</div>}
     </form>
   )
 }

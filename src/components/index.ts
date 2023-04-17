@@ -1,4 +1,6 @@
 export { Button } from './Button'
 export { Checkbox, Radio } from './CheckboxAndRadio'
 export { FileUpload } from './FileUpload'
+export { Label } from './Label'
+export { TextArea } from './TextArea'
 export { TextField } from './TextField'
